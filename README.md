@@ -1,13 +1,14 @@
 # Bateriku Completed Orders Dashboard
 
-Static GitHub Pages package for the completed-orders dashboard.
+Static GitHub Pages dashboard for completed sales orders from 2021 to 2026.
+
+## Dashboard
+
+Open the published dashboard via GitHub Pages once Pages is enabled for this repository.
 
 ## Files
 
-- `index.html` - interactive dashboard
-- `completed_orders_share_pack.pdf` - PDF version for sharing
-- `completed_orders_share_page_1.png` / `completed_orders_share_page_2.png` - image pages
+- `index.html` - self-contained interactive dashboard.
+- `.nojekyll` - GitHub Pages marker.
 
-## GitHub Pages
-
-Enable GitHub Pages from the repository root on the default branch. The dashboard will be available at the Pages URL.
+The PNG/JPG/PDF share pack was generated locally in `C:\Users\THINKPAD\Downloads\bateriku\output` and is not required for the live dashboard.
