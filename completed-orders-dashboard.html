@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bateriku Completed Orders Dashboard</title>
+  <style>
+    :root {
+      --ink: #121722;
+      --muted: #667085;
+      --line: #dfe5ee;
+      --paper: #f4f7fb;
+      --panel: #ffffff;
+      --lime: #94d600;
+      --lime-soft: #f4fadf;
+      --b2c: #243247;
+      --b2b2c: #94d600;
+      --other: #98a2b3;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: var(--paper); color: var(--ink); letter-spacing: 0; }
+    header { background: linear-gradient(90deg, rgba(148,214,0,.16), rgba(148,214,0,0) 36%), #121722; border-bottom: 4px solid var(--lime); color: #fff; }
+    .wrap { width: min(1440px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar { min-height: 112px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0; }
+    .brandline { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; min-width: 0; }
+    .brandmark { height: 32px; width: auto; max-width: 180px; object-fit: contain; background: #fff; border-radius: 8px; padding: 7px 10px; }
+    h1 { margin: 0; font-size: clamp(24px, 4vw, 42px); line-height: 1.02; font-weight: 780; }
+    .sub { margin: 8px 0 0; color: #cbd5e1; font-size: 14px; max-width: 900px; line-height: 1.4; }
+    .pillrow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .pill { border: 1px solid rgba(148,214,0,.38); background: rgba(255,255,255,.08); border-radius: 999px; padding: 7px 10px; color: #ecfccb; font-size: 12px; white-space: nowrap; }
+    main { padding: 20px 0 38px; }
+    .grid { display: grid; gap: 14px; }
+    .kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 14px; }
+    .kpi, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 22px rgba(18,23,34,.06); }
+    .kpi { min-height: 116px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+    .kpi .label { color: #5e6877; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi .value { margin-top: 10px; color: var(--ink); font-size: clamp(23px, 2.2vw, 34px); line-height: 1.05; font-weight: 780; overflow-wrap: anywhere; }
+    .kpi .note { margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.25; }
+    .layout { grid-template-columns: 1.2fr 1fr; align-items: start; }
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .trafficPanel { grid-column: span 2; }
+    .panel { padding: 16px; min-width: 0; }
+    .panel h2 { margin: 0 0 4px; font-size: 18px; line-height: 1.2; }
+    .caption { margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .note { color: var(--muted); font-size: 12px; line-height: 1.25; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: 12px; margin: 2px 0 12px; }
+    .key { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .b2c { background: var(--b2c); }
+    .b2b2c { background: var(--b2b2c); }
+    .single { background: var(--lime); color: #18220a; text-shadow: 0 1px 0 rgba(255,255,255,.45); }
+    .barlist { display: grid; gap: 11px; }
+    .barrow { display: grid; grid-template-columns: minmax(120px, 230px) 1fr 86px; gap: 10px; align-items: center; min-height: 28px; }
+    .barlabel { font-size: 13px; color: #253247; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bartrack { height: 18px; display: flex; overflow: hidden; background: #eef3f8; border: 1px solid #e3eaf2; border-radius: 4px; }
+    .bartrack.singleTrack {
+      position: relative;
+      overflow: visible;
+    }
+    .singleLabel {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      height: 16px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      color: #121722;
+      font-size: 11px;
+      font-weight: 780;
+      line-height: 1;
+      box-shadow: 0 0 0 1px rgba(18,23,34,.08);
+      white-space: nowrap;
+    }
+    .seg {
+      height: 100%;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 760;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-shadow: 0 1px 1px rgba(18,23,34,.36);
+    }
+    .seg.b2b2c {
+      color: #18220a;
+      text-shadow: 0 1px 0 rgba(255,255,255,.45);
+    }
+    .seg.tiny span { display: none; }
+    .barvalue { text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; color: #26364a; }
+    .trafficBreakdowns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .miniBlock { border: 1px solid #e3eaf2; border-radius: 8px; padding: 12px; background: #fbfcfe; min-width: 0; }
+    .miniBlock h3 { margin: 0 0 8px; font-size: 13px; line-height: 1.2; }
+    .mixrow { display: grid; grid-template-columns: minmax(90px, 150px) 1fr 68px; gap: 8px; align-items: center; min-height: 25px; }
+    .mixbar { height: 14px; background: #eef3f8; border-radius: 4px; overflow: hidden; }
+    .mixfill { display: block; height: 100%; border-radius: 4px; }
+    .mixvalue { text-align: right; font-size: 12px; color: #26364a; font-variant-numeric: tabular-nums; }
+    .retentionGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .retentionStat { border: 1px solid #e3eaf2; background: #fbfcfe; border-radius: 8px; padding: 12px; min-height: 84px; }
+    .retentionStat .value { margin-top: 8px; font-size: 26px; line-height: 1; font-weight: 780; color: var(--ink); overflow-wrap: anywhere; }
+    .statusNote { border: 1px solid #dfe5ee; background: #f8fafc; color: #475467; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.4; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .panel > div[id$="Table"] {
+      overflow-x: auto;
+      max-width: 100%;
+    }
+    #stateYearTable table,
+    #manufacturerYearTable table,
+    #trafficYearTable table,
+    #batteryBrandYearTable table,
+    #vehicleRetentionTable table,
+    #ownerRetentionTable table,
+    #returnRateTable table,
+    #returnTimingTable table {
+      min-width: 620px;
+    }
+    th, td { padding: 9px 8px; border-bottom: 1px solid #edf1f5; text-align: right; font-variant-numeric: tabular-nums; vertical-align: top; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-size: 12px; font-weight: 650; background: #f7faef; position: sticky; top: 0; }
+    tr:last-child td { border-bottom: 0; }
+    .stateGroup td {
+      background: #fbfdf6;
+    }
+    .stateGroupStart td {
+      border-top: 2px solid #dfe9c7;
+    }
+    .metricCell {
+      color: var(--muted);
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .callout { border: 1px solid #cfeaa0; background: var(--lime-soft); color: #26320b; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.4; }
+    .footer { padding-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .layout, .three { grid-template-columns: 1fr; } .trafficPanel { grid-column: auto; } }
+    @media (max-width: 760px) { .wrap { width: min(100% - 20px, 1440px); } .topbar { align-items: flex-start; flex-direction: column; } .pillrow { justify-content: flex-start; } .kpis, .two, .retentionGrid, .trafficBreakdowns { grid-template-columns: 1fr; } .panel { padding: 13px; } .barrow { grid-template-columns: minmax(92px, 128px) 1fr 70px; } .mixrow { grid-template-columns: minmax(92px, 128px) 1fr 58px; } table { font-size: 12px; } th, td { padding: 8px 6px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div class="brandline">
+        <img class="brandmark" src="data:image/png;base64,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" alt="Bateriku">
+        <div>
+          <h1>Completed Orders 2021-2026</h1>
+          <p class="sub">Completed sales orders only, split by B2C / HQ vs B2B2C / Branch using the updated Branch rule.</p>
+        </div>
+      </div>
+      <div class="pillrow">
+        <span class="pill" id="rowsPill"></span>
+        <span class="pill">Completed only</span>
+        <span class="pill">BP/BPM = B2B2C</span>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="grid kpis" id="kpis"></section>
+    <section class="grid layout">
+      <div class="grid">
+        <section class="panel">
+          <h2>Yearly Orders: B2C vs B2B2C</h2>
+          <p class="caption">Converted from monthly view to yearly completed-order totals.</p>
+          <div class="legend"><span class="key"><span class="swatch b2c"></span>B2C / HQ</span><span class="key"><span class="swatch b2b2c"></span>B2B2C / Branch</span></div>
+          <div id="yearBars" class="barlist"></div>
+        </section>
+        <section class="panel">
+          <h2>State Split: B2C vs B2B2C</h2>
+          <p class="caption">Overall top states, with state derived from address first and branch area fallback.</p>
+          <div id="stateBars" class="barlist"></div>
+        </section>
+      </div>
+      <div class="grid">
+        <section class="panel">
+          <h2>State Split By Year</h2>
+          <p class="caption">Grouped by state, with years as columns and Orders/B2C/B2B2C as rows.</p>
+          <div id="stateYearTable"></div>
+        </section>
+        <section class="callout" id="ruleCallout"></section>
+      </div>
+    </section>
+    <section class="grid two" style="margin-top:14px">
+      <section class="panel">
+        <h2>Sales Source % By Year</h2>
+        <p class="caption">Each row shows source share within that channel for the year, keeping B2C and B2B2C separate.</p>
+        <div id="trafficYearTable"></div>
+      </section>
+      <section class="panel">
+        <h2>Battery Brand % By Year</h2>
+        <p class="caption">Battery brand inferred from Product names such as ASTRA, Century, Amaron, BFORTY, Bosch and Varta.</p>
+        <div id="batteryBrandYearTable"></div>
+      </section>
+    </section>
+    <section class="grid two" style="margin-top:14px">
+      <section class="panel">
+        <h2>Customer Retention By Vehicle</h2>
+        <p class="caption">Repeat completed battery SKU purchases by normalized plate number across the available timeline.</p>
+        <div id="vehicleRetentionStats" class="retentionGrid"></div>
+        <div id="vehicleRetentionTable"></div>
+      </section>
+      <section class="panel">
+        <h2>Customer Retention By Owner</h2>
+        <p class="caption">Repeat completed battery SKU purchases by phone number when a phone column is available in the order export.</p>
+        <div id="ownerRetentionStats" class="retentionGrid"></div>
+        <div id="ownerRetentionTable"></div>
+      </section>
+    </section>
+    <section class="grid two" style="margin-top:14px">
+      <section class="panel">
+        <h2>Customer Return Behavior</h2>
+        <p class="caption">Cohort return rates by first battery purchase year. 12+ and 18+ months show early return signals; 24+ months is the mature retention benchmark.</p>
+        <div id="returnRateTable"></div>
+      </section>
+      <section class="panel">
+        <h2>First Repeat Timing</h2>
+        <p class="caption">Each plate is grouped by when it first returned after the first battery purchase, helping separate emergency-only, early, planned, normal-cycle and long-cycle behavior.</p>
+        <div id="returnTimingTable"></div>
+        <div class="statusNote" id="returnBehaviorNote" style="margin-top:12px"></div>
+      </section>
+    </section>
+    <section class="grid three" style="margin-top:14px">
+      <section class="panel trafficPanel">
+        <h2>Traffic Group Mix</h2>
+          <p class="caption">Total completed-order volume by traffic group, split by B2C/HQ vs B2B2C/Branch.</p>
+        <div class="legend"><span class="key"><span class="swatch b2c"></span>B2C / HQ</span><span class="key"><span class="swatch b2b2c"></span>B2B2C / Branch</span></div>
+        <div id="trafficBars" class="barlist"></div>
+        <div class="trafficBreakdowns">
+          <div class="miniBlock">
+            <h3>B2C / HQ Source Mix</h3>
+            <div id="b2cTrafficMix"></div>
+          </div>
+          <div class="miniBlock">
+            <h3>B2B2C / Branch Source Mix</h3>
+            <div id="b2b2cTrafficMix"></div>
+          </div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Manufacturer Mix</h2>
+        <p class="caption">Manufacturers above 5% shown individually; lower-share brands grouped as Others.</p>
+        <div id="manufacturerTable"></div>
+      </section>
+      <section class="panel">
+        <h2>Manufacturer % By Year</h2>
+        <p class="caption">Percentage contribution by year, replacing the manufacturer x state view.</p>
+        <div id="manufacturerYearTable"></div>
+      </section>
+    </section>
+    <section class="grid two" style="margin-top:14px">
+      <section class="panel">
+        <h2>Top Dealers</h2>
+        <p class="caption">Top B2B2C / Branch orders based on BP/BPM rule.</p>
+        <div id="dealerTable"></div>
+      </section>
+      <section class="panel">
+        <h2>Top HQ</h2>
+        <p class="caption">Top B2C / HQ orders from the remaining branches.</p>
+        <div id="hqTable"></div>
+      </section>
+    </section>
+    <div class="footer">Generated from completed_orders_2021_2026.csv. Branch rule: starts with BP or contains BPM = B2B2C / Branch; all others = B2C / HQ.</div>
+  </main>
+  <script>
+    const DATA = {"meta": {"sourceFile": "C:\\Users\\THINKPAD\\Downloads\\orders\\completed_orders_2021_2026.csv", "rows": 2239399, "years": ["2021", "2022", "2023", "2024", "2025", "2026"], "rule": "B2B2C / Branch = Branch starts with BP or contains BPM. All other branches = B2C / HQ.", "manufacturerGroups": ["Perodua", "Proton", "Honda", "Toyota", "Others"], "retentionRule": "Retention is calculated from completed battery SKU products only, grouped by distinct purchase dates per clean plate number. Warranty, jump start, checking, delivery, service, dealer order, testing, towing, locksmith, dummy/test plates and other non-battery product rows are excluded.", "phoneColumnsFound": [], "dataEndDate": "2026-06-11"}, "kpis": {"totalCompleted": 2239399, "b2c": 1109721, "b2b2c": 1129678, "b2cShare": 49.6, "b2b2cShare": 50.4, "topYear": "2025", "topYearOrders": 631711, "topState": "Selangor", "topStateOrders": 661305, "topTraffic": "WhatsApp", "topTrafficOrders": 796283}, "yearRows": [{"year": "2021", "total": 161974, "b2c": 95270, "b2b2c": 66704, "b2cShare": 58.8, "b2b2cShare": 41.2}, {"year": "2022", "total": 272694, "b2c": 125349, "b2b2c": 147345, "b2cShare": 46.0, "b2b2cShare": 54.0}, {"year": "2023", "total": 353084, "b2c": 155297, "b2b2c": 197787, "b2cShare": 44.0, "b2b2cShare": 56.0}, {"year": "2024", "total": 484739, "b2c": 225955, "b2b2c": 258784, "b2cShare": 46.6, "b2b2cShare": 53.4}, {"year": "2025", "total": 631711, "b2c": 320301, "b2b2c": 311410, "b2cShare": 50.7, "b2b2cShare": 49.3}, {"year": "2026", "total": 335197, "b2c": 187549, "b2b2c": 147648, "b2cShare": 56.0, "b2b2cShare": 44.0}], "stateRows": [{"state": "Selangor", "total": 661305, "b2c": 438246, "b2b2c": 223059, "b2cShare": 66.3, "b2b2cShare": 33.7}, {"state": "Johor", "total": 302936, "b2c": 112707, "b2b2c": 190229, "b2cShare": 37.2, "b2b2cShare": 62.8}, {"state": "Perak", "total": 202643, "b2c": 4067, "b2b2c": 198576, "b2cShare": 2.0, "b2b2cShare": 98.0}, {"state": "Pulau Pinang", "total": 187784, "b2c": 96854, "b2b2c": 90930, "b2cShare": 51.6, "b2b2cShare": 48.4}, {"state": "Pahang", "total": 173305, "b2c": 92109, "b2b2c": 81196, "b2cShare": 53.1, "b2b2cShare": 46.9}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 167882, "b2c": 145543, "b2b2c": 22339, "b2cShare": 86.7, "b2b2cShare": 13.3}, {"state": "Kedah", "total": 130750, "b2c": 18194, "b2b2c": 112556, "b2cShare": 13.9, "b2b2cShare": 86.1}, {"state": "Negeri Sembilan", "total": 127539, "b2c": 81580, "b2b2c": 45959, "b2cShare": 64.0, "b2b2cShare": 36.0}, {"state": "Melaka", "total": 99572, "b2c": 66654, "b2b2c": 32918, "b2cShare": 66.9, "b2b2cShare": 33.1}, {"state": "Terengganu", "total": 69785, "b2c": 12456, "b2b2c": 57329, "b2cShare": 17.8, "b2b2cShare": 82.2}, {"state": "Kelantan", "total": 37516, "b2c": 12754, "b2b2c": 24762, "b2cShare": 34.0, "b2b2cShare": 66.0}, {"state": "Putrajaya", "total": 34208, "b2c": 14664, "b2b2c": 19544, "b2cShare": 42.9, "b2b2cShare": 57.1}, {"state": "Perlis", "total": 22743, "b2c": 15, "b2b2c": 22728, "b2cShare": 0.1, "b2b2cShare": 99.9}, {"state": "Sarawak", "total": 12055, "b2c": 4555, "b2b2c": 7500, "b2cShare": 37.8, "b2b2cShare": 62.2}, {"state": "Sabah", "total": 9356, "b2c": 9306, "b2b2c": 50, "b2cShare": 99.5, "b2b2cShare": 0.5}, {"state": "Unknown", "total": 16, "b2c": 16, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0}, {"state": "Labuan", "total": 4, "b2c": 1, "b2b2c": 3, "b2cShare": 25.0, "b2b2cShare": 75.0}], "stateYearRows": [{"state": "Selangor", "total": 50687, "b2c": 34114, "b2b2c": 16573, "b2cShare": 67.3, "b2b2cShare": 32.7, "year": "2021"}, {"state": "Johor", "total": 23730, "b2c": 13954, "b2b2c": 9776, "b2cShare": 58.8, "b2b2cShare": 41.2, "year": "2021"}, {"state": "Pulau Pinang", "total": 14510, "b2c": 9158, "b2b2c": 5352, "b2cShare": 63.1, "b2b2cShare": 36.9, "year": "2021"}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 14428, "b2c": 11332, "b2b2c": 3096, "b2cShare": 78.5, "b2b2cShare": 21.5, "year": "2021"}, {"state": "Pahang", "total": 13019, "b2c": 8244, "b2b2c": 4775, "b2cShare": 63.3, "b2b2cShare": 36.7, "year": "2021"}, {"state": "Perak", "total": 12271, "b2c": 148, "b2b2c": 12123, "b2cShare": 1.2, "b2b2cShare": 98.8, "year": "2021"}, {"state": "Negeri Sembilan", "total": 9862, "b2c": 8370, "b2b2c": 1492, "b2cShare": 84.9, "b2b2cShare": 15.1, "year": "2021"}, {"state": "Melaka", "total": 8816, "b2c": 7749, "b2b2c": 1067, "b2cShare": 87.9, "b2b2cShare": 12.1, "year": "2021"}, {"state": "Kedah", "total": 6117, "b2c": 32, "b2b2c": 6085, "b2cShare": 0.5, "b2b2cShare": 99.5, "year": "2021"}, {"state": "Putrajaya", "total": 3457, "b2c": 1629, "b2b2c": 1828, "b2cShare": 47.1, "b2b2cShare": 52.9, "year": "2021"}, {"state": "Terengganu", "total": 3075, "b2c": 74, "b2b2c": 3001, "b2cShare": 2.4, "b2b2cShare": 97.6, "year": "2021"}, {"state": "Perlis", "total": 1314, "b2c": 8, "b2b2c": 1306, "b2cShare": 0.6, "b2b2cShare": 99.4, "year": "2021"}, {"state": "Kelantan", "total": 670, "b2c": 440, "b2b2c": 230, "b2cShare": 65.7, "b2b2cShare": 34.3, "year": "2021"}, {"state": "Unknown", "total": 15, "b2c": 15, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0, "year": "2021"}, {"state": "Sarawak", "total": 2, "b2c": 2, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0, "year": "2021"}, {"state": "Sabah", "total": 1, "b2c": 1, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0, "year": "2021"}, {"state": "Selangor", "total": 78740, "b2c": 48452, "b2b2c": 30288, "b2cShare": 61.5, "b2b2cShare": 38.5, "year": "2022"}, {"state": "Johor", "total": 37119, "b2c": 13075, "b2b2c": 24044, "b2cShare": 35.2, "b2b2cShare": 64.8, "year": "2022"}, {"state": "Perak", "total": 28390, "b2c": 131, "b2b2c": 28259, "b2cShare": 0.5, "b2b2cShare": 99.5, "year": "2022"}, {"state": "Pahang", "total": 24041, "b2c": 13003, "b2b2c": 11038, "b2cShare": 54.1, "b2b2cShare": 45.9, "year": "2022"}, {"state": "Pulau Pinang", "total": 22015, "b2c": 9809, "b2b2c": 12206, "b2cShare": 44.6, "b2b2cShare": 55.4, "year": "2022"}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 21316, "b2c": 17601, "b2b2c": 3715, "b2cShare": 82.6, "b2b2cShare": 17.4, "year": "2022"}, {"state": "Negeri Sembilan", "total": 14981, "b2c": 11087, "b2b2c": 3894, "b2cShare": 74.0, "b2b2cShare": 26.0, "year": "2022"}, {"state": "Kedah", "total": 13632, "b2c": 9, "b2b2c": 13623, "b2cShare": 0.1, "b2b2cShare": 99.9, "year": "2022"}, {"state": "Melaka", "total": 12786, "b2c": 8923, "b2b2c": 3863, "b2cShare": 69.8, "b2b2cShare": 30.2, "year": "2022"}, {"state": "Terengganu", "total": 8057, "b2c": 32, "b2b2c": 8025, "b2cShare": 0.4, "b2b2cShare": 99.6, "year": "2022"}, {"state": "Putrajaya", "total": 4700, "b2c": 1702, "b2b2c": 2998, "b2cShare": 36.2, "b2b2cShare": 63.8, "year": "2022"}, {"state": "Perlis", "total": 3697, "b2c": 2, "b2b2c": 3695, "b2cShare": 0.1, "b2b2cShare": 99.9, "year": "2022"}, {"state": "Kelantan", "total": 2718, "b2c": 1023, "b2b2c": 1695, "b2cShare": 37.6, "b2b2cShare": 62.4, "year": "2022"}, {"state": "Sabah", "total": 492, "b2c": 491, "b2b2c": 1, "b2cShare": 99.8, "b2b2cShare": 0.2, "year": "2022"}, {"state": "Sarawak", "total": 8, "b2c": 7, "b2b2c": 1, "b2cShare": 87.5, "b2b2cShare": 12.5, "year": "2022"}, {"state": "Labuan", "total": 1, "b2c": 1, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0, "year": "2022"}, {"state": "Unknown", "total": 1, "b2c": 1, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0, "year": "2022"}, {"state": "Selangor", "total": 103048, "b2c": 63640, "b2b2c": 39408, "b2cShare": 61.8, "b2b2cShare": 38.2, "year": "2023"}, {"state": "Johor", "total": 49219, "b2c": 14707, "b2b2c": 34512, "b2cShare": 29.9, "b2b2cShare": 70.1, "year": "2023"}, {"state": "Perak", "total": 35392, "b2c": 176, "b2b2c": 35216, "b2cShare": 0.5, "b2b2cShare": 99.5, "year": "2023"}, {"state": "Pulau Pinang", "total": 30425, "b2c": 13734, "b2b2c": 16691, "b2cShare": 45.1, "b2b2cShare": 54.9, "year": "2023"}, {"state": "Pahang", "total": 29103, "b2c": 13330, "b2b2c": 15773, "b2cShare": 45.8, "b2b2cShare": 54.2, "year": "2023"}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 26089, "b2c": 21872, "b2b2c": 4217, "b2cShare": 83.8, "b2b2cShare": 16.2, "year": "2023"}, {"state": "Negeri Sembilan", "total": 18715, "b2c": 12904, "b2b2c": 5811, "b2cShare": 69.0, "b2b2cShare": 31.0, "year": "2023"}, {"state": "Melaka", "total": 16911, "b2c": 10878, "b2b2c": 6033, "b2cShare": 64.3, "b2b2cShare": 35.7, "year": "2023"}, {"state": "Kedah", "total": 16310, "b2c": 27, "b2b2c": 16283, "b2cShare": 0.2, "b2b2cShare": 99.8, "year": "2023"}, {"state": "Terengganu", "total": 10504, "b2c": 728, "b2b2c": 9776, "b2cShare": 6.9, "b2b2cShare": 93.1, "year": "2023"}, {"state": "Putrajaya", "total": 5817, "b2c": 2267, "b2b2c": 3550, "b2cShare": 39.0, "b2b2cShare": 61.0, "year": "2023"}, {"state": "Kelantan", "total": 5158, "b2c": 53, "b2b2c": 5105, "b2cShare": 1.0, "b2b2cShare": 99.0, "year": "2023"}, {"state": "Perlis", "total": 4121, "b2c": 3, "b2b2c": 4118, "b2cShare": 0.1, "b2b2cShare": 99.9, "year": "2023"}, {"state": "Sarawak", "total": 1294, "b2c": 0, "b2b2c": 1294, "b2cShare": 0.0, "b2b2cShare": 100.0, "year": "2023"}, {"state": "Sabah", "total": 978, "b2c": 978, "b2b2c": 0, "b2cShare": 100.0, "b2b2cShare": 0.0, "year": "2023"}, {"state": "Selangor", "total": 145058, "b2c": 92455, "b2b2c": 52603, "b2cShare": 63.7, "b2b2cShare": 36.3, "year": "2024"}, {"state": "Johor", "total": 65632, "b2c": 21452, "b2b2c": 44180, "b2cShare": 32.7, "b2b2cShare": 67.3, "year": "2024"}, {"state": "Pulau Pinang", "total": 41692, "b2c": 20314, "b2b2c": 21378, "b2cShare": 48.7, "b2b2cShare": 51.3, "year": "2024"}, {"state": "Perak", "total": 41401, "b2c": 191, "b2b2c": 41210, "b2cShare": 0.5, "b2b2cShare": 99.5, "year": "2024"}, {"state": "Pahang", "total": 38743, "b2c": 19569, "b2b2c": 19174, "b2cShare": 50.5, "b2b2cShare": 49.5, "year": "2024"}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 33686, "b2c": 28881, "b2b2c": 4805, "b2cShare": 85.7, "b2b2cShare": 14.3, "year": "2024"}, {"state": "Negeri Sembilan", "total": 29191, "b2c": 17718, "b2b2c": 11473, "b2cShare": 60.7, "b2b2cShare": 39.3, "year": "2024"}, {"state": "Kedah", "total": 29121, "b2c": 3245, "b2b2c": 25876, "b2cShare": 11.1, "b2b2cShare": 88.9, "year": "2024"}, {"state": "Melaka", "total": 22109, "b2c": 14645, "b2b2c": 7464, "b2cShare": 66.2, "b2b2cShare": 33.8, "year": "2024"}, {"state": "Terengganu", "total": 15497, "b2c": 2494, "b2b2c": 13003, "b2cShare": 16.1, "b2b2cShare": 83.9, "year": "2024"}, {"state": "Kelantan", "total": 7664, "b2c": 1573, "b2b2c": 6091, "b2cShare": 20.5, "b2b2cShare": 79.5, "year": "2024"}, {"state": "Putrajaya", "total": 7166, "b2c": 2834, "b2b2c": 4332, "b2cShare": 39.5, "b2b2cShare": 60.5, "year": "2024"}, {"state": "Perlis", "total": 4967, "b2c": 1, "b2b2c": 4966, "b2cShare": 0.0, "b2b2cShare": 100.0, "year": "2024"}, {"state": "Sarawak", "total": 2230, "b2c": 13, "b2b2c": 2217, "b2cShare": 0.6, "b2b2cShare": 99.4, "year": "2024"}, {"state": "Sabah", "total": 581, "b2c": 570, "b2b2c": 11, "b2cShare": 98.1, "b2b2cShare": 1.9, "year": "2024"}, {"state": "Labuan", "total": 1, "b2c": 0, "b2b2c": 1, "b2cShare": 0.0, "b2b2cShare": 100.0, "year": "2024"}, {"state": "Selangor", "total": 188487, "b2c": 129270, "b2b2c": 59217, "b2cShare": 68.6, "b2b2cShare": 31.4, "year": "2025"}, {"state": "Johor", "total": 85597, "b2c": 32484, "b2b2c": 53113, "b2cShare": 37.9, "b2b2cShare": 62.1, "year": "2025"}, {"state": "Perak", "total": 54909, "b2c": 708, "b2b2c": 54201, "b2cShare": 1.3, "b2b2cShare": 98.7, "year": "2025"}, {"state": "Pulau Pinang", "total": 52092, "b2c": 27772, "b2b2c": 24320, "b2cShare": 53.3, "b2b2cShare": 46.7, "year": "2025"}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 46271, "b2c": 41388, "b2b2c": 4883, "b2cShare": 89.4, "b2b2cShare": 10.6, "year": "2025"}, {"state": "Pahang", "total": 44841, "b2c": 24995, "b2b2c": 19846, "b2cShare": 55.7, "b2b2cShare": 44.3, "year": "2025"}, {"state": "Kedah", "total": 41317, "b2c": 7667, "b2b2c": 33650, "b2cShare": 18.6, "b2b2cShare": 81.4, "year": "2025"}, {"state": "Negeri Sembilan", "total": 35864, "b2c": 21102, "b2b2c": 14762, "b2cShare": 58.8, "b2b2cShare": 41.2, "year": "2025"}, {"state": "Melaka", "total": 26308, "b2c": 16595, "b2b2c": 9713, "b2cShare": 63.1, "b2b2cShare": 36.9, "year": "2025"}, {"state": "Terengganu", "total": 20639, "b2c": 4606, "b2b2c": 16033, "b2cShare": 22.3, "b2b2cShare": 77.7, "year": "2025"}, {"state": "Kelantan", "total": 12761, "b2c": 4756, "b2b2c": 8005, "b2cShare": 37.3, "b2b2cShare": 62.7, "year": "2025"}, {"state": "Putrajaya", "total": 8563, "b2c": 3386, "b2b2c": 5177, "b2cShare": 39.5, "b2b2cShare": 60.5, "year": "2025"}, {"state": "Perlis", "total": 5748, "b2c": 1, "b2b2c": 5747, "b2cShare": 0.0, "b2b2cShare": 100.0, "year": "2025"}, {"state": "Sarawak", "total": 4829, "b2c": 2113, "b2b2c": 2716, "b2cShare": 43.8, "b2b2cShare": 56.2, "year": "2025"}, {"state": "Sabah", "total": 3483, "b2c": 3458, "b2b2c": 25, "b2cShare": 99.3, "b2b2cShare": 0.7, "year": "2025"}, {"state": "Labuan", "total": 2, "b2c": 0, "b2b2c": 2, "b2cShare": 0.0, "b2b2cShare": 100.0, "year": "2025"}, {"state": "Selangor", "total": 95285, "b2c": 70315, "b2b2c": 24970, "b2cShare": 73.8, "b2b2cShare": 26.2, "year": "2026"}, {"state": "Johor", "total": 41639, "b2c": 17035, "b2b2c": 24604, "b2cShare": 40.9, "b2b2cShare": 59.1, "year": "2026"}, {"state": "Perak", "total": 30280, "b2c": 2713, "b2b2c": 27567, "b2cShare": 9.0, "b2b2cShare": 91.0, "year": "2026"}, {"state": "Pulau Pinang", "total": 27050, "b2c": 16067, "b2b2c": 10983, "b2cShare": 59.4, "b2b2cShare": 40.6, "year": "2026"}, {"state": "Wilayah Persekutuan Kuala Lumpur", "total": 26092, "b2c": 24469, "b2b2c": 1623, "b2cShare": 93.8, "b2b2cShare": 6.2, "year": "2026"}, {"state": "Kedah", "total": 24253, "b2c": 7214, "b2b2c": 17039, "b2cShare": 29.7, "b2b2cShare": 70.3, "year": "2026"}, {"state": "Pahang", "total": 23558, "b2c": 12968, "b2b2c": 10590, "b2cShare": 55.0, "b2b2cShare": 45.0, "year": "2026"}, {"state": "Negeri Sembilan", "total": 18926, "b2c": 10399, "b2b2c": 8527, "b2cShare": 54.9, "b2b2cShare": 45.1, "year": "2026"}, {"state": "Melaka", "total": 12642, "b2c": 7864, "b2b2c": 4778, "b2cShare": 62.2, "b2b2cShare": 37.8, "year": "2026"}, {"state": "Terengganu", "total": 12013, "b2c": 4522, "b2b2c": 7491, "b2cShare": 37.6, "b2b2cShare": 62.4, "year": "2026"}, {"state": "Kelantan", "total": 8545, "b2c": 4909, "b2b2c": 3636, "b2cShare": 57.4, "b2b2cShare": 42.6, "year": "2026"}, {"state": "Putrajaya", "total": 4505, "b2c": 2846, "b2b2c": 1659, "b2cShare": 63.2, "b2b2cShare": 36.8, "year": "2026"}, {"state": "Sabah", "total": 3821, "b2c": 3808, "b2b2c": 13, "b2cShare": 99.7, "b2b2cShare": 0.3, "year": "2026"}, {"state": "Sarawak", "total": 3692, "b2c": 2420, "b2b2c": 1272, "b2cShare": 65.5, "b2b2cShare": 34.5, "year": "2026"}, {"state": "Perlis", "total": 2896, "b2c": 0, "b2b2c": 2896, "b2cShare": 0.0, "b2b2cShare": 100.0, "year": "2026"}], "stateYearPivotRows": [{"state": "Selangor", "metric": "Orders", "2021": 50687, "2022": 78740, "2023": 103048, "2024": 145058, "2025": 188487, "2026": 95285}, {"state": "Selangor", "metric": "B2C", "2021": 34114, "2022": 48452, "2023": 63640, "2024": 92455, "2025": 129270, "2026": 70315}, {"state": "Selangor", "metric": "B2B2C", "2021": 16573, "2022": 30288, "2023": 39408, "2024": 52603, "2025": 59217, "2026": 24970}, {"state": "Johor", "metric": "Orders", "2021": 23730, "2022": 37119, "2023": 49219, "2024": 65632, "2025": 85597, "2026": 41639}, {"state": "Johor", "metric": "B2C", "2021": 13954, "2022": 13075, "2023": 14707, "2024": 21452, "2025": 32484, "2026": 17035}, {"state": "Johor", "metric": "B2B2C", "2021": 9776, "2022": 24044, "2023": 34512, "2024": 44180, "2025": 53113, "2026": 24604}, {"state": "Perak", "metric": "Orders", "2021": 12271, "2022": 28390, "2023": 35392, "2024": 41401, "2025": 54909, "2026": 30280}, {"state": "Perak", "metric": "B2C", "2021": 148, "2022": 131, "2023": 176, "2024": 191, "2025": 708, "2026": 2713}, {"state": "Perak", "metric": "B2B2C", "2021": 12123, "2022": 28259, "2023": 35216, "2024": 41210, "2025": 54201, "2026": 27567}, {"state": "Pulau Pinang", "metric": "Orders", "2021": 14510, "2022": 22015, "2023": 30425, "2024": 41692, "2025": 52092, "2026": 27050}, {"state": "Pulau Pinang", "metric": "B2C", "2021": 9158, "2022": 9809, "2023": 13734, "2024": 20314, "2025": 27772, "2026": 16067}, {"state": "Pulau Pinang", "metric": "B2B2C", "2021": 5352, "2022": 12206, "2023": 16691, "2024": 21378, "2025": 24320, "2026": 10983}, {"state": "Pahang", "metric": "Orders", "2021": 13019, "2022": 24041, "2023": 29103, "2024": 38743, "2025": 44841, "2026": 23558}, {"state": "Pahang", "metric": "B2C", "2021": 8244, "2022": 13003, "2023": 13330, "2024": 19569, "2025": 24995, "2026": 12968}, {"state": "Pahang", "metric": "B2B2C", "2021": 4775, "2022": 11038, "2023": 15773, "2024": 19174, "2025": 19846, "2026": 10590}, {"state": "Wilayah Persekutuan Kuala Lumpur", "metric": "Orders", "2021": 14428, "2022": 21316, "2023": 26089, "2024": 33686, "2025": 46271, "2026": 26092}, {"state": "Wilayah Persekutuan Kuala Lumpur", "metric": "B2C", "2021": 11332, "2022": 17601, "2023": 21872, "2024": 28881, "2025": 41388, "2026": 24469}, {"state": "Wilayah Persekutuan Kuala Lumpur", "metric": "B2B2C", "2021": 3096, "2022": 3715, "2023": 4217, "2024": 4805, "2025": 4883, "2026": 1623}, {"state": "Kedah", "metric": "Orders", "2021": 6117, "2022": 13632, "2023": 16310, "2024": 29121, "2025": 41317, "2026": 24253}, {"state": "Kedah", "metric": "B2C", "2021": 32, "2022": 9, "2023": 27, "2024": 3245, "2025": 7667, "2026": 7214}, {"state": "Kedah", "metric": "B2B2C", "2021": 6085, "2022": 13623, "2023": 16283, "2024": 25876, "2025": 33650, "2026": 17039}, {"state": "Negeri Sembilan", "metric": "Orders", "2021": 9862, "2022": 14981, "2023": 18715, "2024": 29191, "2025": 35864, "2026": 18926}, {"state": "Negeri Sembilan", "metric": "B2C", "2021": 8370, "2022": 11087, "2023": 12904, "2024": 17718, "2025": 21102, "2026": 10399}, {"state": "Negeri Sembilan", "metric": "B2B2C", "2021": 1492, "2022": 3894, "2023": 5811, "2024": 11473, "2025": 14762, "2026": 8527}, {"state": "Melaka", "metric": "Orders", "2021": 8816, "2022": 12786, "2023": 16911, "2024": 22109, "2025": 26308, "2026": 12642}, {"state": "Melaka", "metric": "B2C", "2021": 7749, "2022": 8923, "2023": 10878, "2024": 14645, "2025": 16595, "2026": 7864}, {"state": "Melaka", "metric": "B2B2C", "2021": 1067, "2022": 3863, "2023": 6033, "2024": 7464, "2025": 9713, "2026": 4778}, {"state": "Terengganu", "metric": "Orders", "2021": 3075, "2022": 8057, "2023": 10504, "2024": 15497, "2025": 20639, "2026": 12013}, {"state": "Terengganu", "metric": "B2C", "2021": 74, "2022": 32, "2023": 728, "2024": 2494, "2025": 4606, "2026": 4522}, {"state": "Terengganu", "metric": "B2B2C", "2021": 3001, "2022": 8025, "2023": 9776, "2024": 13003, "2025": 16033, "2026": 7491}, {"state": "Kelantan", "metric": "Orders", "2021": 670, "2022": 2718, "2023": 5158, "2024": 7664, "2025": 12761, "2026": 8545}, {"state": "Kelantan", "metric": "B2C", "2021": 440, "2022": 1023, "2023": 53, "2024": 1573, "2025": 4756, "2026": 4909}, {"state": "Kelantan", "metric": "B2B2C", "2021": 230, "2022": 1695, "2023": 5105, "2024": 6091, "2025": 8005, "2026": 3636}, {"state": "Putrajaya", "metric": "Orders", "2021": 3457, "2022": 4700, "2023": 5817, "2024": 7166, "2025": 8563, "2026": 4505}, {"state": "Putrajaya", "metric": "B2C", "2021": 1629, "2022": 1702, "2023": 2267, "2024": 2834, "2025": 3386, "2026": 2846}, {"state": "Putrajaya", "metric": "B2B2C", "2021": 1828, "2022": 2998, "2023": 3550, "2024": 4332, "2025": 5177, "2026": 1659}, {"state": "Perlis", "metric": "Orders", "2021": 1314, "2022": 3697, "2023": 4121, "2024": 4967, "2025": 5748, "2026": 2896}, {"state": "Perlis", "metric": "B2C", "2021": 8, "2022": 2, "2023": 3, "2024": 1, "2025": 1, "2026": 0}, {"state": "Perlis", "metric": "B2B2C", "2021": 1306, "2022": 3695, "2023": 4118, "2024": 4966, "2025": 5747, "2026": 2896}, {"state": "Sarawak", "metric": "Orders", "2021": 2, "2022": 8, "2023": 1294, "2024": 2230, "2025": 4829, "2026": 3692}, {"state": "Sarawak", "metric": "B2C", "2021": 2, "2022": 7, "2023": 0, "2024": 13, "2025": 2113, "2026": 2420}, {"state": "Sarawak", "metric": "B2B2C", "2021": 0, "2022": 1, "2023": 1294, "2024": 2217, "2025": 2716, "2026": 1272}, {"state": "Sabah", "metric": "Orders", "2021": 1, "2022": 492, "2023": 978, "2024": 581, "2025": 3483, "2026": 3821}, {"state": "Sabah", "metric": "B2C", "2021": 1, "2022": 491, "2023": 978, "2024": 570, "2025": 3458, "2026": 3808}, {"state": "Sabah", "metric": "B2B2C", "2021": 0, "2022": 1, "2023": 0, "2024": 11, "2025": 25, "2026": 13}, {"state": "Unknown", "metric": "Orders", "2021": 15, "2022": 1, "2023": 0, "2024": 0, "2025": 0, "2026": 0}, {"state": "Unknown", "metric": "B2C", "2021": 15, "2022": 1, "2023": 0, "2024": 0, "2025": 0, "2026": 0}, {"state": "Unknown", "metric": "B2B2C", "2021": 0, "2022": 0, "2023": 0, "2024": 0, "2025": 0, "2026": 0}, {"state": "Labuan", "metric": "Orders", "2021": 0, "2022": 1, "2023": 0, "2024": 1, "2025": 2, "2026": 0}, {"state": "Labuan", "metric": "B2C", "2021": 0, "2022": 1, "2023": 0, "2024": 0, "2025": 0, "2026": 0}, {"state": "Labuan", "metric": "B2B2C", "2021": 0, "2022": 0, "2023": 0, "2024": 1, "2025": 2, "2026": 0}], "trafficRows": [{"trafficGroup": "WhatsApp", "total": 796283, "b2c": 282843, "b2b2c": 513440, "b2cShare": 35.5, "b2b2cShare": 64.5}, {"trafficGroup": "Calls / CHD", "total": 367425, "b2c": 276110, "b2b2c": 91315, "b2cShare": 75.1, "b2b2cShare": 24.9}, {"trafficGroup": "Website / app", "total": 248847, "b2c": 176802, "b2b2c": 72045, "b2cShare": 71.0, "b2b2cShare": 29.0}, {"trafficGroup": "Walk-in pitstops", "total": 389047, "b2c": 197673, "b2b2c": 191374, "b2cShare": 50.8, "b2b2cShare": 49.2}, {"trafficGroup": "API / partners", "total": 55576, "b2c": 40545, "b2b2c": 15031, "b2cShare": 73.0, "b2b2cShare": 27.0}, {"trafficGroup": "Marketplace / social", "total": 73717, "b2c": 31982, "b2b2c": 41735, "b2cShare": 43.4, "b2b2cShare": 56.6}, {"trafficGroup": "Rider direct order", "total": 300806, "b2c": 100341, "b2b2c": 200465, "b2cShare": 33.4, "b2b2cShare": 66.6}, {"trafficGroup": "Other / unmapped", "total": 7698, "b2c": 3425, "b2b2c": 4273, "b2cShare": 44.5, "b2b2cShare": 55.5}], "trafficYearShareRows": [{"trafficGroup": "WhatsApp", "channel": "B2C", "2021": 18.8, "2022": 23.2, "2023": 23.9, "2024": 29.6, "2025": 24.8, "2026": 28.0}, {"trafficGroup": "WhatsApp", "channel": "B2B2C", "2021": 33.1, "2022": 39.6, "2023": 43.5, "2024": 48.7, "2025": 47.9, "2026": 48.5}, {"trafficGroup": "Calls / CHD", "channel": "B2C", "2021": 32.2, "2022": 27.2, "2023": 26.0, "2024": 22.3, "2025": 23.5, "2026": 24.1}, {"trafficGroup": "Calls / CHD", "channel": "B2B2C", "2021": 14.9, "2022": 9.9, "2023": 8.1, "2024": 7.6, "2025": 7.3, "2026": 5.6}, {"trafficGroup": "Website / app", "channel": "B2C", "2021": 27.3, "2022": 24.4, "2023": 17.7, "2024": 12.0, "2025": 14.3, "2026": 10.5}, {"trafficGroup": "Website / app", "channel": "B2B2C", "2021": 15.9, "2022": 8.5, "2023": 6.1, "2024": 5.8, "2025": 5.4, "2026": 3.2}, {"trafficGroup": "Walk-in pitstops", "channel": "B2C", "2021": 6.6, "2022": 9.0, "2023": 10.1, "2024": 17.4, "2025": 23.6, "2026": 26.3}, {"trafficGroup": "Walk-in pitstops", "channel": "B2B2C", "2021": 12.0, "2022": 15.3, "2023": 16.9, "2024": 16.8, "2025": 17.1, "2026": 20.9}, {"trafficGroup": "API / partners", "channel": "B2C", "2021": 0.1, "2022": 2.6, "2023": 4.8, "2024": 3.6, "2025": 3.0, "2026": 6.4}, {"trafficGroup": "API / partners", "channel": "B2B2C", "2021": 0.1, "2022": 0.7, "2023": 1.0, "2024": 0.7, "2025": 2.0, "2026": 2.8}, {"trafficGroup": "Marketplace / social", "channel": "B2C", "2021": 0.4, "2022": 1.6, "2023": 3.2, "2024": 3.4, "2025": 4.5, "2026": 1.4}, {"trafficGroup": "Marketplace / social", "channel": "B2B2C", "2021": 0.7, "2022": 3.0, "2023": 4.7, "2024": 3.5, "2025": 4.4, "2026": 3.3}, {"trafficGroup": "Rider direct order", "channel": "B2C", "2021": 13.3, "2022": 11.9, "2023": 14.2, "2024": 11.3, "2025": 6.2, "2026": 2.9}, {"trafficGroup": "Rider direct order", "channel": "B2B2C", "2021": 22.8, "2022": 22.6, "2023": 18.9, "2024": 16.4, "2025": 15.9, "2026": 15.4}, {"trafficGroup": "Other / unmapped", "channel": "B2C", "2021": 1.3, "2022": 0.1, "2023": 0.2, "2024": 0.4, "2025": 0.1, "2026": 0.3}, {"trafficGroup": "Other / unmapped", "channel": "B2B2C", "2021": 0.4, "2022": 0.4, "2023": 0.8, "2024": 0.4, "2025": 0.1, "2026": 0.3}], "manufacturerRows": [{"manufacturer": "Perodua", "total": 830166, "share": 37.1}, {"manufacturer": "Proton", "total": 505365, "share": 22.6}, {"manufacturer": "Others", "total": 359003, "share": 16.0}, {"manufacturer": "Honda", "total": 295695, "share": 13.2}, {"manufacturer": "Toyota", "total": 249170, "share": 11.1}], "manufacturerYearRows": [{"year": "2021", "total": 161974, "Perodua_count": 53600, "Perodua_share": 33.1, "Proton_count": 43523, "Proton_share": 26.9, "Honda_count": 22711, "Honda_share": 14.0, "Toyota_count": 16164, "Toyota_share": 10.0, "Others_count": 25976, "Others_share": 16.0}, {"year": "2022", "total": 272694, "Perodua_count": 96025, "Perodua_share": 35.2, "Proton_count": 67157, "Proton_share": 24.6, "Honda_count": 35838, "Honda_share": 13.1, "Toyota_count": 28317, "Toyota_share": 10.4, "Others_count": 45357, "Others_share": 16.6}, {"year": "2023", "total": 353084, "Perodua_count": 126393, "Perodua_share": 35.8, "Proton_count": 81891, "Proton_share": 23.2, "Honda_count": 47123, "Honda_share": 13.3, "Toyota_count": 39527, "Toyota_share": 11.2, "Others_count": 58150, "Others_share": 16.5}, {"year": "2024", "total": 484739, "Perodua_count": 182685, "Perodua_share": 37.7, "Proton_count": 106489, "Proton_share": 22.0, "Honda_count": 63846, "Honda_share": 13.2, "Toyota_count": 54239, "Toyota_share": 11.2, "Others_count": 77480, "Others_share": 16.0}, {"year": "2025", "total": 631711, "Perodua_count": 242458, "Perodua_share": 38.4, "Proton_count": 134890, "Proton_share": 21.4, "Honda_count": 82010, "Honda_share": 13.0, "Toyota_count": 72258, "Toyota_share": 11.4, "Others_count": 100095, "Others_share": 15.8}, {"year": "2026", "total": 335197, "Perodua_count": 129005, "Perodua_share": 38.5, "Proton_count": 71415, "Proton_share": 21.3, "Honda_count": 44167, "Honda_share": 13.2, "Toyota_count": 38665, "Toyota_share": 11.5, "Others_count": 51945, "Others_share": 15.5}], "batteryBrandRows": [{"batteryBrand": "ASTRA", "total": 1228985, "share": 54.9}, {"batteryBrand": "Amaron", "total": 317516, "share": 14.2}, {"batteryBrand": "Century", "total": 208118, "share": 9.3}, {"batteryBrand": "BFORTY", "total": 87709, "share": 3.9}, {"batteryBrand": "Varta", "total": 58232, "share": 2.6}, {"batteryBrand": "BOSCH", "total": 37749, "share": 1.7}, {"batteryBrand": "Motolite", "total": 14099, "share": 0.6}, {"batteryBrand": "Services / warranty", "total": 237028, "share": 10.6}, {"batteryBrand": "Other / unmapped", "total": 49963, "share": 2.2}], "batteryBrandYearShareRows": [{"batteryBrand": "ASTRA", "total": 1228985, "share": 54.9, "2021": 0.0, "2022": 25.5, "2023": 66.6, "2024": 66.6, "2025": 63.4, "2026": 60.0}, {"batteryBrand": "Amaron", "total": 317516, "share": 14.2, "2021": 47.7, "2022": 29.8, "2023": 6.7, "2024": 9.8, "2025": 8.9, "2026": 9.5}, {"batteryBrand": "Century", "total": 208118, "share": 9.3, "2021": 18.5, "2022": 17.3, "2023": 7.8, "2024": 6.1, "2025": 7.6, "2026": 7.6}, {"batteryBrand": "BFORTY", "total": 87709, "share": 3.9, "2021": 0.0, "2022": 0.0, "2023": 0.3, "2024": 3.9, "2025": 6.3, "2026": 8.2}, {"batteryBrand": "Varta", "total": 58232, "share": 2.6, "2021": 8.9, "2022": 7.0, "2023": 3.4, "2024": 0.9, "2025": 0.8, "2026": 0.9}, {"batteryBrand": "BOSCH", "total": 37749, "share": 1.7, "2021": 1.3, "2022": 3.1, "2023": 3.8, "2024": 1.1, "2025": 0.8, "2026": 1.0}, {"batteryBrand": "Motolite", "total": 14099, "share": 0.6, "2021": 4.1, "2022": 2.7, "2023": 0.0, "2024": 0.0, "2025": 0.0, "2026": 0.0}, {"batteryBrand": "Services / warranty", "total": 237028, "share": 10.6, "2021": 10.2, "2022": 8.5, "2023": 10.2, "2024": 11.2, "2025": 11.1, "2026": 11.1}, {"batteryBrand": "Other / unmapped", "total": 49963, "share": 2.2, "2021": 9.3, "2022": 6.1, "2023": 1.1, "2024": 0.5, "2025": 1.0, "2026": 1.9}], "vehicleRetention": {"label": "Vehicle retention by plate", "available": true, "reason": "", "batterySkuOrders": 1984527, "baseLabel": "Clean purchase occasions", "uniqueIds": 1608638, "repeatIds": 319762, "retentionRate": 19.9, "buckets": [{"bucket": "1 purchase", "ids": 1288876, "share": 80.1, "orders": 1288876, "orderShare": 64.9}, {"bucket": "2 purchases", "ids": 270901, "share": 16.8, "orders": 541802, "orderShare": 27.3}, {"bucket": "3 purchases", "ids": 42699, "share": 2.7, "orders": 128097, "orderShare": 6.5}, {"bucket": ">3 purchases", "ids": 6162, "share": 0.4, "orders": 25752, "orderShare": 1.3}]}, "ownerRetention": {"label": "Owner retention by phone", "available": false, "reason": "Phone number is not available in the current 2021-2026 order CSV export.", "batterySkuOrders": 1998990, "baseLabel": "Battery SKU Orders", "uniqueIds": 0, "repeatIds": 0, "retentionRate": 0, "buckets": [{"bucket": "1 purchase", "ids": 0, "share": 0, "orders": 0, "orderShare": 0.0}, {"bucket": "2 purchases", "ids": 0, "share": 0, "orders": 0, "orderShare": 0.0}, {"bucket": "3 purchases", "ids": 0, "share": 0, "orders": 0, "orderShare": 0.0}, {"bucket": ">3 purchases", "ids": 0, "share": 0, "orders": 0, "orderShare": 0.0}]}, "customerReturnBehavior": {"dataEndDate": "2026-06-11", "rateRows": [{"year": "2021", "base": 143280, "remark": "", "return12Eligible": 143280, "return12Count": 61789, "return12Rate": 43.1, "return18Eligible": 143280, "return18Count": 58793, "return18Rate": 41.0, "return24Eligible": 143280, "return24Count": 53318, "return24Rate": 37.2}, {"year": "2022", "base": 239078, "remark": "", "return12Eligible": 239078, "return12Count": 92549, "return12Rate": 38.7, "return18Eligible": 239078, "return18Count": 86803, "return18Rate": 36.3, "return24Eligible": 239078, "return24Count": 73985, "return24Rate": 30.9}, {"year": "2023", "base": 277342, "remark": "", "return12Eligible": 277342, "return12Count": 85711, "return12Rate": 30.9, "return18Eligible": 277342, "return18Count": 75426, "return18Rate": 27.2, "return24Eligible": 277342, "return24Count": 50666, "return24Rate": 18.3}, {"year": "2024", "base": 339234, "remark": "Partial maturity: only early-2024 purchases have reached the 24-month cycle as of data end.", "return12Eligible": 339234, "return12Count": 52305, "return12Rate": 15.4, "return18Eligible": 318924, "return18Count": 30697, "return18Rate": 9.6, "return24Eligible": 146896, "return24Count": 6459, "return24Rate": 4.4}], "timingRows": [{"year": "2021", "base": 143280, "noRepeat": {"count": 80206, "share": 56.0}, "remark": "", "emergency": {"count": 2619, "share": 1.8}, "early": {"count": 6080, "share": 4.2}, "planned": {"count": 10182, "share": 7.1}, "normal": {"count": 21954, "share": 15.3}, "longCycle": {"count": 22239, "share": 15.5}}, {"year": "2022", "base": 239078, "noRepeat": {"count": 144220, "share": 60.3}, "remark": "", "emergency": {"count": 4428, "share": 1.9}, "early": {"count": 10542, "share": 4.4}, "planned": {"count": 19246, "share": 8.1}, "normal": {"count": 38154, "share": 16.0}, "longCycle": {"count": 22488, "share": 9.4}}, {"year": "2023", "base": 277342, "noRepeat": {"count": 188276, "share": 67.9}, "remark": "", "emergency": {"count": 5487, "share": 2.0}, "early": {"count": 14105, "share": 5.1}, "planned": {"count": 26086, "share": 9.4}, "normal": {"count": 40424, "share": 14.6}, "longCycle": {"count": 2964, "share": 1.1}}, {"year": "2024", "base": 339234, "noRepeat": {"count": 278799, "share": 82.2}, "remark": "Partial maturity: only early-2024 purchases have reached the 24-month cycle as of data end.", "emergency": {"count": 9931, "share": 2.9}, "early": {"count": 21622, "share": 6.4}, "planned": {"count": 23078, "share": 6.8}, "normal": {"count": 5804, "share": 1.7}, "longCycle": {"count": 0, "share": 0.0}}], "bucketLabels": {"emergency": "0-12m", "early": "12-18m", "planned": "18-24m", "normal": "24-36m", "longCycle": "36m+", "noRepeat": "No repeat yet"}, "note": "2021-2023 are full-year mature cohorts. 2024 is included with a partial-maturity remark because the data ends before the full 2024 cohort reaches 24 months."}, "topDealers": [{"branch": "BP KAMUNTING", "state": "Perak", "total": 34995}, {"branch": "BP BANGI", "state": "Selangor", "total": 27700}, {"branch": "BP PUNCAK ALAM", "state": "Selangor", "total": 26606}, {"branch": "BP IPOH", "state": "Perak", "total": 26013}, {"branch": "BP SUNGAI BULOH", "state": "Selangor", "total": 24669}, {"branch": "BP SKUDAI", "state": "Johor", "total": 24076}, {"branch": "BP NILAI", "state": "Negeri Sembilan", "total": 23720}, {"branch": "BP KANGAR", "state": "Perlis", "total": 22245}, {"branch": "BP KULIM", "state": "Kedah", "total": 20072}, {"branch": "BP KUALA KANGSAR", "state": "Perak", "total": 19792}, {"branch": "BP TELUK KUMBAR", "state": "Pulau Pinang", "total": 19245}, {"branch": "BP SEMENYIH", "state": "Selangor", "total": 16843}, {"branch": "BP ALOR SETAR", "state": "Kedah", "total": 16798}, {"branch": "BP BANDAR BOTANIC", "state": "Selangor", "total": 16393}, {"branch": "BP KERAMAT", "state": "Wilayah Persekutuan Kuala Lumpur", "total": 15577}, {"branch": "BP BANDAR RIMBAYU", "state": "Selangor", "total": 15159}, {"branch": "BP TANJUNG MALIM", "state": "Perak", "total": 15156}, {"branch": "BP SUNGAI DUA", "state": "Pulau Pinang", "total": 14913}, {"branch": "BP KEMAMAN", "state": "Terengganu", "total": 14569}, {"branch": "BP PUCHONG", "state": "Selangor", "total": 14468}], "topHq": [{"branch": "HQ SEKSYEN 7", "state": "Selangor", "total": 53923}, {"branch": "HQ KUANTAN", "state": "Pahang", "total": 48305}, {"branch": "HQ MELAKA", "state": "Melaka", "total": 47063}, {"branch": "HQ TTDI JAYA WALK-IN CENTRE", "state": "Selangor", "total": 42976}, {"branch": "HQ SETAPAK", "state": "Wilayah Persekutuan Kuala Lumpur", "total": 37774}, {"branch": "HQ SENAWANG", "state": "Negeri Sembilan", "total": 35173}, {"branch": "HQ PULAU PINANG", "state": "Pulau Pinang", "total": 33145}, {"branch": "HQ PASIR GUDANG", "state": "Johor", "total": 29013}, {"branch": "HQ DENGKIL", "state": "Selangor", "total": 24320}, {"branch": "HQ KELANA JAYA", "state": "Selangor", "total": 21757}, {"branch": "HQ KINRARA", "state": "Selangor", "total": 20273}, {"branch": "HQ PELANGI DAMANSARA", "state": "Selangor", "total": 20088}, {"branch": "HQ KAJANG TAMAN SRI JENARIS", "state": "Selangor", "total": 19348}, {"branch": "HQ PERLING", "state": "Johor", "total": 18365}, {"branch": "HQ SENDAYAN", "state": "Negeri Sembilan", "total": 17192}, {"branch": "HQ BALAKONG", "state": "Selangor", "total": 16662}, {"branch": "HQ DAMANSARA DAMAI", "state": "Selangor", "total": 15445}, {"branch": "HQ AMPANG", "state": "Selangor", "total": 15175}, {"branch": "HQ PUDU", "state": "Wilayah Persekutuan Kuala Lumpur", "total": 14887}, {"branch": "HQ BANDAR MELAKA", "state": "Melaka", "total": 14843}]};
+    const fmt = new Intl.NumberFormat("en-MY");
+    const number = value => fmt.format(value || 0);
+    const pctFmt = value => `${Number(value || 0).toFixed(1)}%`;
+    const share = (value, total) => total ? (value / total) * 100 : 0;
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    function splitBar(row) {
+      const b2cShare = share(row.b2c, row.total);
+      const b2b2cShare = share(row.b2b2c, row.total);
+      return `<div class="bartrack"><span class="seg b2c ${b2cShare < 9 ? "tiny" : ""}" style="width:${b2cShare}%"><span>${pctFmt(b2cShare)}</span></span><span class="seg b2b2c ${b2b2cShare < 9 ? "tiny" : ""}" style="width:${b2b2cShare}%"><span>${pctFmt(b2b2cShare)}</span></span></div>`;
+    }
+    function renderBars(id, rows, labelKey, limit = rows.length) {
+      document.getElementById(id).innerHTML = rows.slice(0, limit).map(row => `
+        <div class="barrow" title="${esc(row[labelKey])}">
+          <div class="barlabel">${esc(row[labelKey])}</div>
+          ${splitBar(row)}
+          <div class="barvalue">${number(row.total)}</div>
+        </div>
+      `).join("");
+    }
+    function renderSingleBars(id, rows, labelKey) {
+      const max = Math.max(...rows.map(row => row.total), 1);
+      const total = rows.reduce((sum, row) => sum + row.total, 0);
+      document.getElementById(id).innerHTML = rows.map(row => {
+        const width = (row.total / max) * 100;
+        const totalShare = share(row.total, total);
+        return `
+          <div class="barrow" title="${esc(row[labelKey])}">
+            <div class="barlabel">${esc(row[labelKey])}</div>
+            <div class="bartrack singleTrack"><span class="seg single" style="width:${width}%"></span><span class="singleLabel">${pctFmt(totalShare)}</span></div>
+            <div class="barvalue">${number(row.total)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+    function channelTrafficRows(channelKey, channelTotal) {
+      return DATA.trafficRows
+        .map(row => ({ trafficGroup: row.trafficGroup, total: row[channelKey], share: share(row[channelKey], channelTotal) }))
+        .filter(row => row.total > 0)
+        .sort((a, b) => b.total - a.total);
+    }
+    function renderTrafficMix(id, rows, fillClass) {
+      const max = Math.max(...rows.map(row => row.total), 1);
+      document.getElementById(id).innerHTML = rows.map(row => `
+        <div class="mixrow" title="${esc(row.trafficGroup)}: ${number(row.total)} orders">
+          <div class="barlabel">${esc(row.trafficGroup)}</div>
+          <div class="mixbar"><span class="mixfill ${fillClass}" style="width:${(row.total / max) * 100}%"></span></div>
+          <div class="mixvalue">${pctFmt(row.share)}</div>
+        </div>
+      `).join("");
+    }
+    function table(headers, rows) {
+      return `<table><thead><tr>${headers.map(h => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table>`;
+    }
+    function renderRetention(statsId, tableId, data) {
+      const stats = document.getElementById(statsId);
+      const tableTarget = document.getElementById(tableId);
+      if (!data.available) {
+        stats.innerHTML = `
+          <div class="retentionStat"><div class="label">Status</div><div class="value">N/A</div><div class="note">Missing source field</div></div>
+          <div class="retentionStat"><div class="label">${esc(data.baseLabel || "Battery SKU Orders")}</div><div class="value">${number(data.batterySkuOrders)}</div><div class="note">Filtered base</div></div>
+          <div class="retentionStat"><div class="label">Retention Rate</div><div class="value">N/A</div><div class="note">Needs phone number</div></div>
+        `;
+        tableTarget.innerHTML = `<div class="statusNote">${esc(data.reason || "Required identifier is not available in the current export.")}</div>`;
+        return;
+      }
+      stats.innerHTML = `
+        <div class="retentionStat"><div class="label">Retention Rate</div><div class="value">${pctFmt(data.retentionRate)}</div><div class="note">IDs with 2+ purchases</div></div>
+        <div class="retentionStat"><div class="label">Repeat IDs</div><div class="value">${number(data.repeatIds)}</div><div class="note">Out of ${number(data.uniqueIds)} unique IDs</div></div>
+        <div class="retentionStat"><div class="label">${esc(data.baseLabel || "Battery SKU Orders")}</div><div class="value">${number(data.batterySkuOrders)}</div><div class="note">Non-battery and dummy rows excluded</div></div>
+      `;
+      tableTarget.innerHTML = table(["Purchase Frequency", "Unique IDs", "ID Share", "Purchases", "Purchase Share"], data.buckets.map(row =>
+        `<tr><td>${esc(row.bucket)}</td><td>${number(row.ids)}</td><td>${pctFmt(row.share)}</td><td>${number(row.orders)}</td><td>${pctFmt(row.orderShare)}</td></tr>`
+      ));
+    }
+    function rateCell(count, eligible, rate) {
+      return `<strong>${pctFmt(rate)}</strong><br><span class="note">${number(count)} / ${number(eligible)} eligible</span>`;
+    }
+    function timingCell(cell) {
+      return `<strong>${pctFmt(cell.share)}</strong><br><span class="note">${number(cell.count)} plates</span>`;
+    }
+    function renderReturnBehavior() {
+      const behavior = DATA.customerReturnBehavior;
+      document.getElementById("returnRateTable").innerHTML = table(
+        ["Cohort", "Full Base", "12+ Months", "18+ Months", "24+ Months", "Remark"],
+        behavior.rateRows.map(row => `
+          <tr>
+            <td>${esc(row.year)}</td>
+            <td>${number(row.base)}</td>
+            <td>${rateCell(row.return12Count, row.return12Eligible, row.return12Rate)}</td>
+            <td>${rateCell(row.return18Count, row.return18Eligible, row.return18Rate)}</td>
+            <td>${rateCell(row.return24Count, row.return24Eligible, row.return24Rate)}</td>
+            <td class="metricCell">${esc(row.remark || "Full-year mature cohort")}</td>
+          </tr>
+        `)
+      );
+      const labels = behavior.bucketLabels;
+      document.getElementById("returnTimingTable").innerHTML = table(
+        ["Cohort", "Base", labels.emergency, labels.early, labels.planned, labels.normal, labels.longCycle, labels.noRepeat],
+        behavior.timingRows.map(row => `
+          <tr>
+            <td>${esc(row.year)}</td>
+            <td>${number(row.base)}</td>
+            <td>${timingCell(row.emergency)}</td>
+            <td>${timingCell(row.early)}</td>
+            <td>${timingCell(row.planned)}</td>
+            <td>${timingCell(row.normal)}</td>
+            <td>${timingCell(row.longCycle)}</td>
+            <td>${timingCell(row.noRepeat)}</td>
+          </tr>
+        `)
+      );
+      document.getElementById("returnBehaviorNote").textContent = `${behavior.note} Data end date: ${DATA.meta.dataEndDate}.`;
+    }
+    function render() {
+      document.getElementById("rowsPill").textContent = `${number(DATA.meta.rows)} orders`;
+      document.getElementById("ruleCallout").textContent = DATA.meta.rule;
+      const kpis = [
+        ["Completed Orders", number(DATA.kpis.totalCompleted), "2021 to 2026 completed only"],
+        ["B2C / HQ", number(DATA.kpis.b2c), `${pctFmt(DATA.kpis.b2cShare)} of completed`],
+        ["B2B2C / Branch", number(DATA.kpis.b2b2c), `${pctFmt(DATA.kpis.b2b2cShare)} of completed`],
+        ["Peak Year", DATA.kpis.topYear, `${number(DATA.kpis.topYearOrders)} orders`],
+        ["Top State", DATA.kpis.topState, `${number(DATA.kpis.topStateOrders)} orders`],
+        ["Top Traffic", DATA.kpis.topTraffic, `${number(DATA.kpis.topTrafficOrders)} orders`],
+      ];
+      document.getElementById("kpis").innerHTML = kpis.map(([label, value, note]) => `
+        <div class="kpi"><div><div class="label">${esc(label)}</div><div class="value">${esc(value)}</div></div><div class="note">${esc(note)}</div></div>
+      `).join("");
+      renderBars("yearBars", DATA.yearRows, "year");
+      renderBars("stateBars", DATA.stateRows, "state", 14);
+      renderBars("trafficBars", DATA.trafficRows, "trafficGroup");
+      renderTrafficMix("b2cTrafficMix", channelTrafficRows("b2c", DATA.kpis.b2c), "b2c");
+      renderTrafficMix("b2b2cTrafficMix", channelTrafficRows("b2b2c", DATA.kpis.b2b2c), "b2b2c");
+      const years = DATA.meta.years;
+      let previousState = "";
+      document.getElementById("stateYearTable").innerHTML = table(["State", "Metric", ...years], DATA.stateYearPivotRows.map(row => {
+        const showState = row.state !== previousState;
+        const stateCell = showState ? esc(row.state) : "";
+        previousState = row.state;
+        return `<tr class="stateGroup ${showState ? "stateGroupStart" : ""}"><td>${stateCell}</td><td class="metricCell">${esc(row.metric)}</td>${years.map(year => `<td>${number(row[year])}</td>`).join("")}</tr>`;
+      }));
+      document.getElementById("manufacturerTable").innerHTML = table(["Manufacturer", "Orders", "Share"], DATA.manufacturerRows.map(row =>
+        `<tr><td>${esc(row.manufacturer)}</td><td>${number(row.total)}</td><td>${pctFmt(row.share)}</td></tr>`
+      ));
+      const groups = DATA.meta.manufacturerGroups;
+      document.getElementById("manufacturerYearTable").innerHTML = table(["Year", ...groups.map(g => `${g} %`)], DATA.manufacturerYearRows.map(row =>
+        `<tr><td>${esc(row.year)}</td>${groups.map(g => `<td>${pctFmt(row[`${g}_share`])}</td>`).join("")}</tr>`
+      ));
+      document.getElementById("trafficYearTable").innerHTML = table(["Sales Source", "Channel", ...years], DATA.trafficYearShareRows.map(row =>
+        `<tr><td>${esc(row.trafficGroup)}</td><td class="metricCell">${esc(row.channel)}</td>${years.map(year => `<td>${pctFmt(row[year])}</td>`).join("")}</tr>`
+      ));
+      document.getElementById("batteryBrandYearTable").innerHTML = table(["Battery Brand", "All Share", ...years], DATA.batteryBrandYearShareRows.map(row =>
+        `<tr><td>${esc(row.batteryBrand)}</td><td>${pctFmt(row.share)}</td>${years.map(year => `<td>${pctFmt(row[year])}</td>`).join("")}</tr>`
+      ));
+      renderRetention("vehicleRetentionStats", "vehicleRetentionTable", DATA.vehicleRetention);
+      renderRetention("ownerRetentionStats", "ownerRetentionTable", DATA.ownerRetention);
+      renderReturnBehavior();
+      document.getElementById("dealerTable").innerHTML = table(["Branch", "State", "Orders"], DATA.topDealers.map(row =>
+        `<tr><td>${esc(row.branch)}</td><td>${esc(row.state)}</td><td>${number(row.total)}</td></tr>`
+      ));
+      document.getElementById("hqTable").innerHTML = table(["Branch", "State", "Orders"], DATA.topHq.map(row =>
+        `<tr><td>${esc(row.branch)}</td><td>${esc(row.state)}</td><td>${number(row.total)}</td></tr>`
+      ));
+    }
+    render();
+  </script>
+</body>
+</html>
